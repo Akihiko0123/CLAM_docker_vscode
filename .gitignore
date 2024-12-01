@@ -2,3 +2,5 @@
 __pycache__/
 notebooks
 *.ndpi
+*.jpg
+*.h5
