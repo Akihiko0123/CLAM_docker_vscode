@@ -1,0 +1,8 @@
+services:
+  dev:
+    user: developer
+    # コンテナ内のdeveloperユーザーがsshやgitを使用できるように指定
+    volumes:
+      - ~/.ssh:/home/developer/.ssh:ro
+      - ~/.gitconfig:/home/developer/.gitconfig
+

@@ -1,0 +1,58 @@
+# プロジェクト名。コンテナ名等のprefixとして付与される
+name: clam
+# コンテナ全体の設定
+services:
+  # service内の１つのサービス名(任意名)
+  dev:
+    # コンテナにホストと同等の特権を持たせる
+    privileged: true
+    # Dockerのimage名
+    image: clam:dev-${USERNAME}
+    # docker build条件
+    build:
+      # コンテナビルドの基準になるディレクトリ
+      # `docker-compose.yml`から見て`Dockerfile`が格納されたディレクトリパス
+      # `docker-compose.yml`が`clam/`にあり、`Dockerfile`は`clam/docker`にあるため、
+      # `docker`を指定
+      context: docker
+      # Dockerfileの指定
+      dockerfile: Dockerfile
+      # ビルドの際のステージを指定(開発用の部分が不要の場合はbase)
+      # 他のステージをDockerfileに追加しtargetに指定してもOK
+      target: dev
+      args:
+        - USER_UID=${HOST_UID}
+        - USER_GID=${HOST_GID}
+    # nvidiaのGPU(id=0を指定)を用いる場合
+    # deploy:
+      # resources:
+        # reservations:
+          # devices:
+            # - driver: "nvidia"
+              # capabilities: ["gpu"]
+              # nvidia-smiで確認できるGPU IDを指定
+              # device_ids: ["0"]
+    user: "${HOST_UID}:${HOST_GID}"
+    # ホスト側のネットワークを指定
+    # 別途ポートを指定する場合、`network_mode:`は記載せず、
+    # 代わりに`ports:`を記載し`- "8888:8888"`(ホストのポート:コンテナのポート)
+    # のようにポート番号を指定する
+    network_mode: "host"
+    # ボリューム設定
+    volumes:
+      # ホストのカレントディレクトリをコンテナ内の/workspaces/clamにマウント
+      # (ホストでの変更を動的にコンテナに反映)
+      - .:/workspaces/clam
+      # ホストのデバイスディレクトリをコンテナ内の/devにマウント
+      # (GPUやUSBデバイスへのアクセス用)
+      - /dev:/dev
+    # コンテナ内の作業ディレクトリ
+    working_dir: /workspaces/clam
+    # 対話型操作用
+    stdin_open: true
+    # docker execでアクセス用
+    tty: true
+    # コンテナをバックグラウンドで起動し続けるため
+    # コンテナ内で常にJupyter等の他のプロセスを起動する場合は必要なし
+    command: >
+      bash -c "tail -f /dev/null"
