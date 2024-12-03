@@ -4,3 +4,5 @@ notebooks
 *.ndpi
 *.jpg
 *.h5
+seg_stitched_ndpi/*
+feature_extracted/*
