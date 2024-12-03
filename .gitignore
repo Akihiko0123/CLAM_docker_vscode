@@ -6,3 +6,4 @@ notebooks
 *.h5
 seg_stitched_ndpi/*
 feature_extracted/*
+process_list_autogen.csv
